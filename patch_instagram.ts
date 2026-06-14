@@ -237,24 +237,27 @@ content = content.replace('app.post("/api/setup-telegram", ', webhookEndpoints);
 
 fs.writeFileSync('server.ts', content);
 // تمام کدهای انتهای فایل را با این جایگزین کن:
+import fs from 'fs';
+let content = fs.readFileSync('server.ts', 'utf8');
 
-// کد جدید را دقیقاً به این شکل در فایل patch بنویس
+// تعریف API جدید
 const n8nEndpoint = `
-  app.post("/api/n8n-check-slots", async (req, res) => {
-    try {
-      const { startDate, endDate, durationMinutes } = req.body;
-      const adapter = getCalendarAdapter(activeConfig);
-      const result = await adapter.checkSlots(startDate, endDate, durationMinutes);
-      res.status(200).json(result);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch slots" });
-    }
-  });
+app.post("/api/n8n-check-slots", async (req, res) => {
+  try {
+    const { startDate, endDate, durationMinutes } = req.body;
+    const adapter = getCalendarAdapter(activeConfig);
+    const result = await adapter.checkSlots(startDate, endDate, durationMinutes);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch slots" });
+  }
+});
 `;
 
-// نکته حیاتی: اینجا به جای app.post("/api/setup-telegram")، 
-// بهتر است کد را قبل از اولین تعریفِ route اصلی اضافه کنیم.
-// اگر فایل شما با app.use شروع می‌شود، این خط را پیدا کن:
-content = content.replace("app.use(", n8nEndpoint + "\napp.use(");
+// تزریق کد بلافاصله بعد از تعریف app و قبل از هر روت دیگری
+if (!content.includes('/api/n8n-check-slots')) {
+  // فرض می‌کنیم app = express() در فایل تعریف شده است
+  content = content.replace("const app = express();", "const app = express();\n" + n8nEndpoint);
+}
 
 fs.writeFileSync('server.ts', content);
