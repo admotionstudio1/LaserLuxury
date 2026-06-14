@@ -239,6 +239,7 @@ fs.writeFileSync('server.ts', content);
 // تمام کدهای انتهای فایل را با این جایگزین کن:
 
 // این بخش را دقیقا جایگزین قبلی کن
+// کدِ n8n را اینجا تعریف کنید
 const n8nEndpoint = `
   app.post("/api/n8n-check-slots", async (req, res) => {
     try {
@@ -252,9 +253,6 @@ const n8nEndpoint = `
   });
 `;
 
-// نکته مهم: ما اینجا به جای جستجوی app.post("/api/setup-telegram")
-// دنبال کدی می‌گردیم که سرور را راه می‌اندازد تا قبل از آن اضافه شود
-content = content.replace("app.listen", n8nEndpoint + "\napp.listen");
-
-fs.writeFileSync('server.ts', content);
-// حالا یکبار replace نهایی را انجام بده:
+// مهم: این کد را جایگزینِ خطی کنید که app شروع می‌شود
+// مثلاً این خط را پیدا کنید: app.post("/webhook"
+content = content.replace('app.post("/webhook"', n8nEndpoint + '\napp.post("/webhook"');
