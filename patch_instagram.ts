@@ -238,8 +238,7 @@ content = content.replace('app.post("/api/setup-telegram", ', webhookEndpoints);
 fs.writeFileSync('server.ts', content);
 // تمام کدهای انتهای فایل را با این جایگزین کن:
 
-// این بخش را دقیقا جایگزین قبلی کن
-// کدِ n8n را اینجا تعریف کنید
+// کد جدید را دقیقاً به این شکل در فایل patch بنویس
 const n8nEndpoint = `
   app.post("/api/n8n-check-slots", async (req, res) => {
     try {
@@ -253,6 +252,9 @@ const n8nEndpoint = `
   });
 `;
 
-// مهم: این کد را جایگزینِ خطی کنید که app شروع می‌شود
-// مثلاً این خط را پیدا کنید: app.post("/webhook"
-content = content.replace('app.post("/webhook"', n8nEndpoint + '\napp.post("/webhook"');
+// نکته حیاتی: اینجا به جای app.post("/api/setup-telegram")، 
+// بهتر است کد را قبل از اولین تعریفِ route اصلی اضافه کنیم.
+// اگر فایل شما با app.use شروع می‌شود، این خط را پیدا کن:
+content = content.replace("app.use(", n8nEndpoint + "\napp.use(");
+
+fs.writeFileSync('server.ts', content);
