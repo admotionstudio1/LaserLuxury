@@ -1488,12 +1488,21 @@ OFFICIAL SERVICES & PRICE LIST - LASER LUXURY:
 
   app.listen(PORT, () => {
     console.log(`Server running smoothly on port ${PORT}`);
+    app.use(express.json()); // مطمئن شو این خط در ابتدای فایل هست
+
+app.post('/api/n8n-bridge', async (req, res) => {
+  const { chatId, platform, userMessage, config } = req.body;
+  // این تابع دقیقاً همان منطقی را اجرا می‌کند که ربات تلگرامت دارد
+  const response = await processTelegramUpdate({ message: { text: userMessage, chat: { id: chatId } } }, config);
+  res.json({ success: true, reply: response });
+});
     
     // Auto-start polling if config loaded at boot
     if (activeConfig && activeConfig.telegramToken) {
       console.log("Found existing telegram instance in config, starting polling automatically on boot...");
       // Ensure any old webhook is cleared
       fetch(`https://api.telegram.org/bot${activeConfig.telegramToken}/deleteWebhook`).catch(() => {});
+      
       startTelegramPolling(activeConfig);
     }
     
