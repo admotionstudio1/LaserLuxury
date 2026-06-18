@@ -1489,17 +1489,15 @@ OFFICIAL SERVICES & PRICE LIST - LASER LUXURY:
   app.listen(PORT, () => {
     console.log(`Server running smoothly on port ${PORT}`);
     
-    // Auto-start polling if config loaded at boot
-    if (activeConfig && activeConfig.telegramToken) {
-      console.log("Found existing telegram instance in config, starting polling automatically on boot...");
-      // Ensure any old webhook is cleared
-      fetch(`https://api.telegram.org/bot${activeConfig.telegramToken}/deleteWebhook`).catch(() => {});
-      startTelegramPolling(activeConfig);
+ // Auto-start polling if config loaded at boot
+if (activeConfig && activeConfig.telegramToken) {
+    if (!(global as any).isPollingStarted) { // چک کردن وضعیت قبلی
+        (global as any).isPollingStarted = true; // علامت‌گذاری به عنوان شروع شده
+        console.log("Found existing telegram instance in config, starting polling automatically on boot...");
+        // Ensure any old webhook is cleared
+        fetch(`https://api.telegram.org/bot${activeConfig.telegramToken}/deleteWebhook`).catch(() => {});
+        startTelegramPolling(activeConfig);
+    } else {
+        console.log("Polling already initialized, skipping duplicate start.");
     }
-    
-    // Setup cron
-    setupDailyReminders();
-  });
 }
-
-startServer().catch(console.error);
