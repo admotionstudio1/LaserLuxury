@@ -1373,18 +1373,31 @@ OFFICIAL SERVICES & PRICE LIST - LASER LUXURY:
       let audioDataOut = null;
       let outMimeType = null;
       
-      if (incomingAudioData) {
-         try {
-           const EdgeTTS = (await import('node-edge-tts')).EdgeTTS;
-           let voiceCode = 'en-US-AriaNeural'; // default English
-           const lowerText = textPart.toLowerCase();
-           if (/[\u0600-\u06FF]/.test(textPart)) {
-               voiceCode = 'fa-IR-DilaraNeural'; // Persian
-           } else if (/[åäöÅÄÖ]/i.test(textPart) || /\b(hej|tack|ja|nej|bra|jag|är|en|ett|för)\b/i.test(textPart)) {
-               voiceCode = 'sv-SE-SofieNeural'; // Swedish
-           } else if (/[áéíóúñ¿¡]/i.test(textPart) || /\b(gracias|hola|adiós|sí|claro|por favor|el|la|los|las|y)\b/i.test(textPart)) {
-               voiceCode = 'es-ES-ElviraNeural'; // Spanish
-           }
+     if (incomingAudioData) {
+    try {
+        const EdgeTTS = (await import('node-edge-tts')).EdgeTTS;
+        let voiceCode = 'en-US-AriaNeural'; // default English
+        const lowerText = textPart.toLowerCase();
+
+        if (/[\u0600-\u06FF]/.test(textPart)) {
+            voiceCode = 'fa-IR-DilaraNeural'; // Persian
+        } else if (/[\u00e4\u00f6\u00e5\u00c4\u00d6\u00c5]/i.test(textPart) || /\b(hej|tack|ja|nej|bra|jag|är|en|ett|för)\b/i.test(textPart)) {
+            voiceCode = 'sv-SE-SofieNeural'; // Swedish
+        } else if (/[\u00e1\u00e9\u00ed\u00f3\u00fa\u00f1\u00bf\u00a1]/i.test(textPart) || /\b(gracias|hola|adiós|sí|claro|por favor|el|la|los|las|y)\b/i.test(textPart)) {
+            voiceCode = 'es-ES-ElviraNeural'; // Spanish
+            
+        // ----- اضافه کردن زبان‌های جدید در اینجا -----
+        } else if (/\b(hallo|guten tag|danke|ja|nein|entschuldigung|freitag)\b/i.test(textPart)) {
+            voiceCode = 'de-DE-KatjaNeural'; // German (آلمانی)
+        } else if (/\b(ciao|buongiorno|grazie|sì|no|prego)\b/i.test(textPart)) {
+            voiceCode = 'it-IT-ElsaNeural'; // Italian (ایتالیایی)
+        } else if (/\b(olá|bom dia|obrigado|sim|não)\b/i.test(textPart)) {
+            voiceCode = 'pt-PT-DuarteNeural'; // Portuguese (پرتغالی)
+        }
+        // ---------------------------------------------
+    }
+    // ... ادامه کدهای شما
+}
 
            const outName = `/tmp/web_tts_${Date.now()}.mp3`;
            const cleanWebText = sanitizeTTS(textPart);
