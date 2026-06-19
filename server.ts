@@ -1379,25 +1379,30 @@ OFFICIAL SERVICES & PRICE LIST - LASER LUXURY:
         let voiceCode = 'en-US-AriaNeural'; // default English
         const lowerText = textPart.toLowerCase();
 
+        // بررسی زبان فارسی
         if (/[\u0600-\u06FF]/.test(textPart)) {
-            voiceCode = 'fa-IR-DilaraNeural'; // Persian
-        } else if (/[\u00e4\u00f6\u00e5\u00c4\u00d6\u00c5]/i.test(textPart) || /\b(hej|tack|ja|nej|bra|jag|är|en|ett|för)\b/i.test(textPart)) {
-            voiceCode = 'sv-SE-SofieNeural'; // Swedish
-        } else if (/[\u00e1\u00e9\u00ed\u00f3\u00fa\u00f1\u00bf\u00a1]/i.test(textPart) || /\b(gracias|hola|adiós|sí|claro|por favor|el|la|los|las|y)\b/i.test(textPart)) {
-            voiceCode = 'es-ES-ElviraNeural'; // Spanish
+            voiceCode = 'fa-IR-DilaraNeural'; 
             
-        // ----- اضافه کردن زبان‌های جدید در اینجا -----
-        } else if (/\b(hallo|guten tag|danke|ja|nein|entschuldigung|freitag)\b/i.test(textPart)) {
+        // بررسی زبان سوئدی
+        } else if (/[\u00e4\u00f6\u00e5\u00c4\u00d6\u00c5]/i.test(textPart) || /\b(hej|tack|ja|nej|bra|jag|är|en|ett|för|ledig|boka)\b/i.test(lowerText)) {
+            voiceCode = 'sv-SE-SofieNeural'; 
+            
+        // بررسی زبان اسپانیایی
+        } else if (/[\u00e1\u00e9\u00ed\u00f3\u00fa\u00f1\u00bf\u00a1]/i.test(textPart) || /\b(gracias|hola|adiós|sí|claro|por favor)\b/i.test(lowerText)) {
+            voiceCode = 'es-ES-ElviraNeural'; 
+
+        // ----- فیکسِ قطعی برای آلمانی (با بررسی کلمات رایج آلمانی در پاسخ) -----
+        } else if (/\b(h[aä]ll[oö]|guten|tag|danke|nein|entschuldigung|super|ist|ledig|freitag|uhr|termin)\b/i.test(lowerText) || lowerText.includes(' ist ') || lowerText.includes(' ledig ')) {
             voiceCode = 'de-DE-KatjaNeural'; // German (آلمانی)
-        } else if (/\b(ciao|buongiorno|grazie|sì|no|prego)\b/i.test(textPart)) {
+
+        // بررسی ایتالیایی
+        } else if (/\b(ciao|buongiorno|grazie|prego)\b/i.test(lowerText)) {
             voiceCode = 'it-IT-ElsaNeural'; // Italian (ایتالیایی)
-        } else if (/\b(olá|bom dia|obrigado|sim|não)\b/i.test(textPart)) {
+
+        // بررسی پرتغالی
+        } else if (/\b(olá|bom dia|obrigado)\b/i.test(lowerText)) {
             voiceCode = 'pt-PT-DuarteNeural'; // Portuguese (پرتغالی)
         }
-        // ---------------------------------------------
-    }
-    // ... ادامه کدهای شما
-}
 
            const outName = `/tmp/web_tts_${Date.now()}.mp3`;
            const cleanWebText = sanitizeTTS(textPart);
