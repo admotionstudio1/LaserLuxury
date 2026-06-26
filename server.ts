@@ -611,10 +611,37 @@ async function processTelegramUpdate(update: any, config: any, platform: string 
   if (!update.message.chat) return;
 
   const chatId = update.message.chat.id;
+  try {
+    // 🌟 تزریق پایگاه داده برای بارگذاری پویای اطلاعات بیزینس
+    if (supabase) {
+      const { data: sessionData } = await supabase
+        .from('chat_history')
+        .select('business_id')
+        .eq('user_id', chatId.toString())
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (sessionData && sessionData.business_id) {
+        const { data: activeTenant } = await supabase
+          .from('businesses')
+          .select('*')
+          .eq('id', sessionData.business_id)
+          .single();
+
+        if (activeTenant) {
+          config.telegramToken = activeTenant.telegram_bot_token;
+          config.googleCalendarId = activeTenant.google_calendar_id;
+          config.systemPrompt = activeTenant.custom_system_prompt;
+        }
+      }
+    }
+    // 🌟 پایان تزریق
 
   try {
     const text = update.message.text;
     const voice = update.message.voice;
+    
     
     const ai = new GoogleGenAI({ apiKey: apiKey || process.env.GEMINI_API_KEY });
     if (!chatSessions[chatId]) chatSessions[chatId] = [];
@@ -953,6 +980,31 @@ async function processInstagramUpdate(webhook_event: any, config: any, platform:
 
   const chatId = `ig_${senderId}`;
   const voice = null; 
+  try {
+  // 🌟 تزریق پایگاه داده برای بارگذاری پویای اطلاعات بیزینس (اینستاگرام)
+  if (supabase) {
+    const { data: sessionData } = await supabase
+      .from('chat_history')
+      .select('business_id')
+      .eq('user_id', chatId.toString())
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (sessionData && sessionData.business_id) {
+      const { data: activeTenant } = await supabase
+        .from('businesses')
+        .select('*')
+        .eq('id', sessionData.business_id)
+        .single();
+
+      if (activeTenant && config) {
+        config.systemPrompt = activeTenant.custom_system_prompt;
+        config.googleCalendarId = activeTenant.google_calendar_id;
+      }
+    }
+  }
+  // 🌟 پایان تزریق
 
   try {
     const ai = new GoogleGenAI({ apiKey: config?.apiKey || process.env.GEMINI_API_KEY });
